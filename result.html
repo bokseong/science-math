@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="나의 생일 별자리 결과">
   <title>나의 별자리 결과</title>
-  <link rel="stylesheet" href="style.css?v=20261013-1">
+  <link rel="stylesheet" href="style.css?v=20261014-1">
 </head>
 <body class="result-page">
   <main class="result-shell">
@@ -24,9 +24,10 @@
       </div>
       <section class="fortune-box" aria-labelledby="fortune-title">
         <p>✦ STAR MESSAGE</p>
-        <h2 id="fortune-title">오늘의 별빛 운세</h2>
+        <h2 id="fortune-title">10월 14일의 별빛 운세</h2>
         <div id="fortune-list" class="fortune-list"></div>
-        <small>운세는 축전 체험을 위한 재미 요소입니다.</small>
+        <small id="fortune-source">운세 데이터를 불러오는 중입니다.</small>
+        <small>운세는 과학적 예측이나 의료·법률·금융 조언이 아닌 축전 체험용 콘텐츠입니다.</small>
       </section>
       <a class="retry-link" href="index.html">다른 생일로 찾아보기 <span aria-hidden="true">↺</span></a>
     </section>
@@ -36,6 +37,7 @@
     <img class="club-logo" src="assets/deepsky-logo.png" alt="DEEP SKY 천문동아리 로고">
     <p>DEEP SKY 천문동아리 자체 제작<br><small>과학·수학 축전 별자리 체험 프로그램</small></p>
   </footer>
-  <script src="app.js?v=20261013-1"></script>
+  <script src="horoscope-data.js?v=20261014-1"></script>
+  <script src="app.js?v=20261014-1"></script>
 </body>
 </html>

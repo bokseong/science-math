@@ -18,33 +18,15 @@ const zodiacImageFiles = {
   cancer:'cnc', leo:'leo', virgo:'vir', libra:'lib', scorpio:'sco', sagittarius:'sgr'
 };
 
-const fortuneSets = {
-  '총운': [
-    '새로운 것을 자세히 관찰하면 작은 발견이 기다리고 있어요.',
-    '천천히 준비한 일이 좋은 흐름을 만들 수 있어요.',
-    '호기심을 따라 한 걸음 더 나아가 보기 좋은 날이에요.'
-  ],
-  '애정운': [
-    '친구에게 먼저 건넨 다정한 말이 오래 기억될 수 있어요.',
-    '함께 웃는 순간이 오늘의 가장 밝은 별이 될 거예요.',
-    '상대의 이야기를 차분히 들어 보면 마음이 더 가까워져요.'
-  ],
-  '금전운': [
-    '필요한 것과 원하는 것을 구분해 보면 현명한 선택이 쉬워져요.',
-    '작은 절약이 다음 활동에 쓸 수 있는 여유가 될 수 있어요.',
-    '계획을 세워 사용하면 만족스러운 선택을 할 수 있어요.'
-  ],
-  '학업운': [
-    '궁금한 점을 한 번 더 질문하면 이해가 또렷해질 거예요.',
-    '짧게라도 기록한 관찰 내용이 좋은 공부 자료가 돼요.',
-    '어려운 문제는 순서를 나누어 보면 해결의 실마리가 보여요.'
-  ],
-  '건강운': [
-    '활동 사이에 물을 마시고 잠깐 쉬면 집중력이 오래가요.',
-    '바른 자세로 만들기 활동을 하면 몸도 한결 편안해요.',
-    '가벼운 스트레칭으로 몸의 긴장을 풀어 주세요.'
-  ]
-};
+const festivalDate = '2026-10-14';
+const firestoreDocumentUrl = 'https://firestore.googleapis.com/v1/projects/bit-code-lab-2026/databases/%28default%29/documents/festivalHoroscopes/2026-10-14?key=AIzaSyBUZ1IU5exTw3gELm7criA7ECT_Z4osld4';
+const fortuneCategories = [
+  ['overall', '총운'],
+  ['love', '애정운'],
+  ['money', '금전운'],
+  ['study', '학업운'],
+  ['health', '건강운']
+];
 
 const yearlyFortuneParts = {
   tones: ['차분한', '선명한', '따뜻한', '용감한', '유연한', '반짝이는', '단단한', '새로운', '조화로운', '깊이 있는'],
@@ -53,10 +35,15 @@ const yearlyFortuneParts = {
   actions: ['첫 단추를 채워 보세요.', '작은 변화를 기록해 보세요.', '좋은 질문을 하나 더 해 보세요.', '마지막 확인을 잊지 마세요.', '주변의 도움을 받아 보세요.', '새로운 방법을 시험해 보세요.', '생각을 말이나 글로 표현해 보세요.', '중요한 일부터 정리해 보세요.', '잠깐 쉬며 방향을 살펴보세요.', '정한 목표를 마무리해 보세요.']
 };
 
-function getYearFortune(year, categoryIndex) {
-  const digits = String(year).padStart(4, '0').slice(-4).split('').map(Number);
-  const rotated = digits.map((_, index) => digits[(index + categoryIndex) % digits.length]);
-  return `${yearlyFortuneParts.tones[rotated[0]]} 빛을 띠어요. ${yearlyFortuneParts.strengths[rotated[1]]}을 살려 ${yearlyFortuneParts.rhythms[rotated[2]]} ${yearlyFortuneParts.actions[rotated[3]]}`;
+function getBirthdayFortune(year, month, day, categoryIndex) {
+  const birthCode = `${String(year).padStart(4, '0')}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`;
+  const digits = birthCode.split('').map(Number);
+  const offset = categoryIndex * 2;
+  const tone = yearlyFortuneParts.tones[digits[offset % digits.length]];
+  const strength = yearlyFortuneParts.strengths[digits[(offset + 3) % digits.length]];
+  const rhythm = yearlyFortuneParts.rhythms[digits[(offset + 5) % digits.length]];
+  const action = yearlyFortuneParts.actions[digits[(offset + 7) % digits.length]];
+  return `${year}년 ${month}월 ${day}일생의 ${tone} 흐름이에요. ${strength}을 살려 ${rhythm} ${action}`;
 }
 
 function getYearFortuneCode(year, month, day, categoryIndex) {
@@ -65,12 +52,23 @@ function getYearFortuneCode(year, month, day, categoryIndex) {
   return String(value).padStart(4, '0');
 }
 
-function getFortuneDate(now = new Date()) {
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1;
-  const day = now.getDate();
-  const dayNumber = Math.floor(Date.UTC(year, month - 1, day) / 86400000);
-  return { year, month, day, dayNumber };
+async function loadFestivalHoroscope() {
+  try {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 4500);
+    const response = await fetch(firestoreDocumentUrl, { signal: controller.signal, cache: 'no-store' });
+    window.clearTimeout(timeout);
+    if (!response.ok) throw new Error(`Firestore ${response.status}`);
+    const document = await response.json();
+    const payload = document.fields?.payload?.stringValue;
+    if (!payload) throw new Error('Firestore payload missing');
+    const data = JSON.parse(payload);
+    if (data.date !== festivalDate || !data.signs) throw new Error('Unexpected horoscope document');
+    return { data, fromFirestore: true };
+  } catch (error) {
+    console.warn('Firestore 운세를 불러오지 못해 내장 데이터를 사용합니다.', error);
+    return { data: festivalHoroscopeFallback, fromFirestore: false };
+  }
 }
 
 function isBetween(month, day, sign) {
@@ -118,7 +116,7 @@ function setupEntryPage() {
   });
 }
 
-function setupResultPage() {
+async function setupResultPage() {
   if (!document.querySelector('#result-card')) return;
   const params = new URLSearchParams(location.search);
   const match = (params.get('birthday') || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -135,11 +133,16 @@ function setupResultPage() {
   document.querySelector('#zodiac-symbol').textContent = sign.symbol;
   document.querySelector('#zodiac-element').textContent = sign.element;
   document.querySelector('#zodiac-star').textContent = sign.star;
-  const fortuneDate = getFortuneDate();
-  const seed = year * 37 + month * 31 + day + sign.name.length + fortuneDate.dayNumber;
-  document.querySelector('#fortune-title').textContent = `${fortuneDate.month}월 ${fortuneDate.day}일의 별빛 운세`;
+  document.querySelector('#fortune-title').textContent = '10월 14일의 별빛 운세';
   const list = document.querySelector('#fortune-list');
-  Object.entries(fortuneSets).forEach(([category, messages], index) => {
+  list.setAttribute('aria-busy', 'true');
+  list.innerHTML = '<p class="fortune-loading">별빛 운세 데이터를 불러오는 중...</p>';
+  const { data, fromFirestore } = await loadFestivalHoroscope();
+  const fortunes = data.signs[sign.key];
+  if (!fortunes) { location.replace('index.html'); return; }
+  list.innerHTML = '';
+  list.removeAttribute('aria-busy');
+  fortuneCategories.forEach(([field, category], index) => {
     const item = document.createElement('div');
     item.className = 'fortune-item';
     const heading = document.createElement('strong');
@@ -147,14 +150,18 @@ function setupResultPage() {
     const copy = document.createElement('div');
     copy.className = 'fortune-copy';
     const message = document.createElement('span');
-    message.textContent = `${messages[(seed + index * 5) % messages.length]} ${getYearFortune(year, index)}`;
+    message.textContent = `${fortunes[field]} ${getBirthdayFortune(year, month, day, index)}`;
     const code = document.createElement('small');
     code.className = 'fortune-code';
-    code.textContent = `${fortuneDate.year}.${fortuneDate.month}.${fortuneDate.day} 기준 · ${year}년생 별빛 코드 ${getYearFortuneCode(year, month, day, index)}`;
+    code.textContent = `2026.10.14 기준 · 생년월일 고정 코드 ${getYearFortuneCode(year, month, day, index)}`;
     copy.append(message, code);
     item.append(heading, copy);
     list.append(item);
   });
+  const source = document.querySelector('#fortune-source');
+  source.textContent = fromFirestore
+    ? 'Firestore 저장 데이터 · Powered by astroway.api'
+    : '오프라인 예비 데이터 · Powered by astroway.api';
 }
 
 setupEntryPage();
