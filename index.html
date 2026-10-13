@@ -17,15 +17,26 @@
       <p class="intro">생일을 입력하고 나의 황도 12궁 별자리와<br>오늘의 별빛 메시지를 확인해 보세요.</p>
 
       <form id="birthday-form" class="birthday-form" novalidate>
-        <label for="birthday">생일</label>
-        <input id="birthday" name="birthday" type="date" required aria-describedby="date-help">
-        <p id="date-help" class="field-help">태어난 연도는 별자리 판정에 사용하지 않아요.</p>
+        <label for="birthday">태어난 날</label>
+        <input id="birthday" name="birthday" type="text" inputmode="numeric" autocomplete="off" placeholder="예: 2008년 10월 14일" required aria-describedby="date-help">
+        <p id="date-help" class="field-help">예: 2008년 10월 14일 · 2008/10/14 · 20081014<br>출생연도까지 반영해 별빛 메시지를 골라요.</p>
         <p id="form-error" class="form-error" role="alert" hidden></p>
         <button type="submit">내 별자리 알아보기 <span aria-hidden="true">→</span></button>
       </form>
     </section>
     <p class="science-note">※ 생일 별자리는 황도 12궁 분류입니다. 실제 밤하늘에서 보이는 별자리는 날짜·시간·관측 장소에 따라 달라질 수 있습니다.</p>
   </main>
+  <footer class="club-footer" aria-label="제작 동아리">
+    <img class="club-logo" src="assets/deepsky-logo.png" alt="DEEP SKY 천문동아리 로고">
+    <p>DEEP SKY 천문동아리 자체 제작<br><small>과학·수학 축전 별자리 체험 프로그램</small></p>
+  </footer>
+  <div id="star-reader" class="star-reader" aria-hidden="true">
+    <div class="reader-sky"><i></i><i></i><i></i><i></i></div>
+    <div class="reader-star">✦</div>
+    <div class="reader-telescope"><span></span><i></i><b></b></div>
+    <div class="reader-astrologer"><i></i><b></b><span></span></div>
+    <p>별을 읽고 있어요…</p>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>

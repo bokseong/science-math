@@ -60,7 +60,18 @@ function isValidCalendarDate(year, month, day) {
   return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
 }
 
-function dateLabel(month, day) { return `${month}월 ${day}일`; }
+function dateLabel(year, month, day) { return `${year}년 ${month}월 ${day}일`; }
+
+function parseBirthdayInput(value) {
+  const normalized = value.trim();
+  let match = normalized.match(/^(\d{4})\s*(?:년|[./-])\s*(\d{1,2})\s*(?:월|[./-])\s*(\d{1,2})\s*일?$/);
+  if (!match) match = normalized.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  return isValidCalendarDate(year, month, day) ? { year, month, day } : null;
+}
 
 function setupEntryPage() {
   const form = document.querySelector('#birthday-form');
@@ -69,10 +80,14 @@ function setupEntryPage() {
     event.preventDefault();
     const input = document.querySelector('#birthday');
     const error = document.querySelector('#form-error');
-    if (!input.value) { error.textContent = '생일을 선택해 주세요.'; error.hidden = false; input.focus(); return; }
-    const [, year, month, day] = input.value.match(/^(\d{4})-(\d{2})-(\d{2})$/) || [];
-    if (!year || !month || !day || !isValidCalendarDate(Number(year), Number(month), Number(day))) { error.textContent = '올바른 날짜를 선택해 주세요.'; error.hidden = false; return; }
-    location.href = `result.html?birthday=${encodeURIComponent(input.value)}`;
+    const birthday = parseBirthdayInput(input.value);
+    if (!birthday) { error.textContent = '예: 2008년 10월 14일 또는 2008/10/14처럼 입력해 주세요.'; error.hidden = false; input.focus(); return; }
+    error.hidden = true;
+    const button = form.querySelector('button');
+    button.disabled = true;
+    document.body.classList.add('is-reading-stars');
+    const encodedDate = `${birthday.year}-${String(birthday.month).padStart(2, '0')}-${String(birthday.day).padStart(2, '0')}`;
+    window.setTimeout(() => { location.href = `result.html?birthday=${encodeURIComponent(encodedDate)}`; }, 1700);
   });
 }
 
@@ -86,14 +101,14 @@ function setupResultPage() {
   document.title = `${sign.name} | 나의 별자리 찾기`;
   const imageFile = zodiacImageFiles[sign.key];
   document.querySelector('#constellation-art').innerHTML = `<img src="assets/zodiac-images/${imageFile}.png" alt="${sign.name} 실제 별 위치와 딥스카이 성도">`;
-  document.querySelector('#date-display').textContent = `${dateLabel(month, day)}에 태어난 당신의 별자리`;
+  document.querySelector('#date-display').textContent = `${dateLabel(year, month, day)}에 태어난 당신의 별자리`;
   document.querySelector('#zodiac-name').textContent = sign.name;
   document.querySelector('#zodiac-period').textContent = sign.period;
   document.querySelector('#zodiac-summary').textContent = sign.summary;
   document.querySelector('#zodiac-symbol').textContent = sign.symbol;
   document.querySelector('#zodiac-element').textContent = sign.element;
   document.querySelector('#zodiac-star').textContent = sign.star;
-  const seed = month * 31 + day + sign.name.length;
+  const seed = year * 37 + month * 31 + day + sign.name.length;
   const list = document.querySelector('#fortune-list');
   Object.entries(fortuneSets).forEach(([category, messages], index) => {
     const item = document.createElement('div');
