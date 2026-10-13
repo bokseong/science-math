@@ -13,16 +13,38 @@ const zodiacSigns = [
   { key:'sagittarius', name:'사수자리', period:'11월 22일 — 12월 21일', start:[11,22], end:[12,21], symbol:'궁수', element:'불', star:'카우스 아우스트랄리스', summary:'화살이 향하는 곳처럼, 넓은 세상과 새로운 질문을 향해 나아가는 별자리예요.', points:'65,58 113,88 166,56 211,91 164,129 114,115 65,143 M164,129 217,150', stars:[[65,58,4],[113,88,4],[166,56,5],[211,91,4],[164,129,5],[114,115,4],[65,143,4],[217,150,4]] }
 ];
 
-const fortunes = [
-  '새로운 것을 자세히 관찰하면 작은 발견이 기다리고 있어요.',
-  '친구와 생각을 나누면 더 재미있는 아이디어가 떠오를 거예요.',
-  '오늘은 궁금한 것을 한 가지 더 질문해 보기 좋은 날이에요.',
-  '천천히 살펴본 흔적이 멋진 결과로 이어질 수 있어요.',
-  '별처럼 반짝이는 친절 한마디를 건네 보세요.',
-  '직접 만들고 실험해 보는 용기가 빛나는 하루예요.',
-  '새로운 관점에서 보면 익숙한 것도 다르게 보일 거예요.',
-  '관찰 노트에 재미있는 사실 하나를 적어 보세요.'
-];
+const zodiacImageFiles = {
+  capricorn:'cap', aquarius:'aqr', pisces:'psc', aries:'ari', taurus:'tau', gemini:'gem',
+  cancer:'cnc', leo:'leo', virgo:'vir', libra:'lib', scorpio:'sco', sagittarius:'sgr'
+};
+
+const fortuneSets = {
+  '총운': [
+    '새로운 것을 자세히 관찰하면 작은 발견이 기다리고 있어요.',
+    '천천히 준비한 일이 좋은 흐름을 만들 수 있어요.',
+    '호기심을 따라 한 걸음 더 나아가 보기 좋은 날이에요.'
+  ],
+  '애정운': [
+    '친구에게 먼저 건넨 다정한 말이 오래 기억될 수 있어요.',
+    '함께 웃는 순간이 오늘의 가장 밝은 별이 될 거예요.',
+    '상대의 이야기를 차분히 들어 보면 마음이 더 가까워져요.'
+  ],
+  '금전운': [
+    '필요한 것과 원하는 것을 구분해 보면 현명한 선택이 쉬워져요.',
+    '작은 절약이 다음 활동에 쓸 수 있는 여유가 될 수 있어요.',
+    '계획을 세워 사용하면 만족스러운 선택을 할 수 있어요.'
+  ],
+  '학업운': [
+    '궁금한 점을 한 번 더 질문하면 이해가 또렷해질 거예요.',
+    '짧게라도 기록한 관찰 내용이 좋은 공부 자료가 돼요.',
+    '어려운 문제는 순서를 나누어 보면 해결의 실마리가 보여요.'
+  ],
+  '건강운': [
+    '활동 사이에 물을 마시고 잠깐 쉬면 집중력이 오래가요.',
+    '바른 자세로 만들기 활동을 하면 몸도 한결 편안해요.',
+    '가벼운 스트레칭으로 몸의 긴장을 풀어 주세요.'
+  ]
+};
 
 function isBetween(month, day, sign) {
   const current = month * 100 + day;
@@ -36,11 +58,6 @@ function findZodiac(month, day) { return zodiacSigns.find(sign => isBetween(mont
 function isValidCalendarDate(year, month, day) {
   const date = new Date(year, month - 1, day);
   return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
-}
-
-function constellationSvg(sign) {
-  const dots = sign.stars.map(([x,y,size], index) => `<circle class="${size > 5 ? 'big-star' : 'star'}" cx="${x}" cy="${y}" r="${size}" aria-label="별 ${index + 1}"/>`).join('');
-  return `<svg viewBox="0 0 310 190" role="img" aria-label="${sign.name} 별자리 선 그림"><path class="line" d="M ${sign.points}"/>${dots}</svg>`;
 }
 
 function dateLabel(month, day) { return `${month}월 ${day}일`; }
@@ -67,7 +84,8 @@ function setupResultPage() {
   const year = Number(match[1]); const month = Number(match[2]); const day = Number(match[3]); const sign = findZodiac(month, day);
   if (!isValidCalendarDate(year, month, day) || !sign) { location.replace('index.html'); return; }
   document.title = `${sign.name} | 나의 별자리 찾기`;
-  document.querySelector('#constellation-art').innerHTML = constellationSvg(sign);
+  const imageFile = zodiacImageFiles[sign.key];
+  document.querySelector('#constellation-art').innerHTML = `<img src="assets/zodiac-images/${imageFile}.png" alt="${sign.name} 실제 별 위치와 딥스카이 성도">`;
   document.querySelector('#date-display').textContent = `${dateLabel(month, day)}에 태어난 당신의 별자리`;
   document.querySelector('#zodiac-name').textContent = sign.name;
   document.querySelector('#zodiac-period').textContent = sign.period;
@@ -76,7 +94,17 @@ function setupResultPage() {
   document.querySelector('#zodiac-element').textContent = sign.element;
   document.querySelector('#zodiac-star').textContent = sign.star;
   const seed = month * 31 + day + sign.name.length;
-  document.querySelector('#fortune-text').textContent = fortunes[seed % fortunes.length];
+  const list = document.querySelector('#fortune-list');
+  Object.entries(fortuneSets).forEach(([category, messages], index) => {
+    const item = document.createElement('div');
+    item.className = 'fortune-item';
+    const heading = document.createElement('strong');
+    heading.textContent = category;
+    const message = document.createElement('span');
+    message.textContent = messages[(seed + index * 5) % messages.length];
+    item.append(heading, message);
+    list.append(item);
+  });
 }
 
 setupEntryPage();
