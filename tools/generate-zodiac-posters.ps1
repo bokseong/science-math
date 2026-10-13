@@ -1,6 +1,7 @@
 param(
   [Parameter(Mandatory = $true)] [string] $DataRoot,
-  [string] $OutputRoot = (Join-Path $PSScriptRoot '..\assets\zodiac-charts')
+  [string] $OutputRoot = (Join-Path $PSScriptRoot '..\assets\zodiac-charts'),
+  [string] $OverlayRoot = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -85,7 +86,13 @@ foreach ($spec in $posterSpecs) {
 
   $starMarkup = foreach ($star in $backgroundStars) {
     $mag = [double]$star.properties.mag; $r = [Math]::Max(0.8, [Math]::Min(4.2, 5.3 - $mag * 0.62))
-    '<circle class="star" cx="{0}" cy="{1}" r="{2}" />' -f (Format-SvgNumber (& $toX ([double]$star.geometry.coordinates[0]))), (Format-SvgNumber (& $toY ([double]$star.geometry.coordinates[1]))), (Format-SvgNumber $r)
+    $x = Format-SvgNumber (& $toX ([double]$star.geometry.coordinates[0])); $y = Format-SvgNumber (& $toY ([double]$star.geometry.coordinates[1])); $radius = Format-SvgNumber $r
+    if ($mag -le 3.5) {
+      $spike = Format-SvgNumber ([Math]::Max(10, $r * 4.3))
+      '<g class="bright-star" transform="translate({0} {1})"><path d="M 0,-{2} L 0,{2} M -{2},0 L {2},0"/><circle r="{3}" /></g>' -f $x,$y,$spike,$radius
+    } else {
+      '<circle class="star" cx="{0}" cy="{1}" r="{2}" />' -f $x,$y,$radius
+    }
   }
   $lineMarkup = foreach ($path in $lineFeature.geometry.coordinates) {
     $commands = @(); $first = $true
@@ -105,16 +112,26 @@ foreach ($spec in $posterSpecs) {
     $label = if ($dso.id) { [string]$dso.id } else { [string]$dso.properties.desig }
     "$shape<text class=`"dso-label`" x=`"$(Format-SvgNumber ($x + 11))`" y=`"$(Format-SvgNumber ($y - 7))`">$(Escape-Xml $label)</text>"
   }
+  # 상징 일러스트는 투명 레이어로 먼저 렌더링해 실제 항성·딥스카이·연결선을 절대 가리지 않는다.
+  $overlayMarkup = ''
+  if ($OverlayRoot) {
+    $overlayPath = Join-Path $OverlayRoot ("{0}.png" -f $spec.Id.ToLowerInvariant())
+    if (Test-Path -LiteralPath $overlayPath) {
+      $overlayBase64 = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($overlayPath))
+      $overlayMarkup = '<image class="zodiac-overlay" href="data:image/png;base64,{0}" x="115" y="115" width="1370" height="1370" preserveAspectRatio="xMidYMid meet" />' -f $overlayBase64
+    }
+  }
   $svg = @"
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600" viewBox="0 0 1600 1600" role="img" aria-labelledby="title desc">
   <title id="title">$($spec.Korean) 실제 좌표 성도</title>
   <desc id="desc">J2000 적경과 적위를 등거리로 투영한 $($spec.Latin) 별자리 성도. 항성, 별자리 선, 딥스카이 위치를 표시한다.</desc>
   <style>
-    .star { fill:#fff6c6; } .constellation { fill:none; stroke:#f6d36a; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; filter:url(#glow) } .dso { fill:#d7a4ff; fill-opacity:.65; stroke:#f0c6ff; stroke-width:2 } .dso-label { fill:#edccff; font:700 20px Arial,sans-serif; paint-order:stroke; stroke:#101a42; stroke-width:5px; stroke-linejoin:round } .edge { fill:none; stroke:#e5c45f; stroke-width:2 }
+    .zodiac-overlay { opacity:.19; } .star { fill:#fff8cb; filter:url(#starGlow) } .bright-star { fill:#fff8c5; filter:url(#brightGlow) } .bright-star path { stroke:#fff3ac; stroke-width:1.7; stroke-linecap:round; opacity:.9 } .constellation { fill:none; stroke:#f6d36a; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; filter:url(#glow) } .dso { fill:#d7a4ff; fill-opacity:.65; stroke:#f0c6ff; stroke-width:2 } .dso-label { fill:#edccff; font:700 20px Arial,sans-serif; paint-order:stroke; stroke:#101a42; stroke-width:5px; stroke-linejoin:round } .edge { fill:none; stroke:#e5c45f; stroke-width:2 }
   </style>
-  <defs><radialGradient id="sky"><stop stop-color="#1d2a65"/><stop offset="1" stop-color="#060b24"/></radialGradient><filter id="glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <defs><radialGradient id="sky"><stop stop-color="#1d2a65"/><stop offset="1" stop-color="#060b24"/></radialGradient><filter id="glow"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="starGlow"><feGaussianBlur stdDeviation="1.1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="brightGlow" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
   <rect width="1600" height="1600" fill="#060b24"/><rect x="20" y="20" width="1560" height="1560" rx="20" fill="url(#sky)" stroke="#f0d47e" stroke-opacity=".6"/>
   <rect x="$chartX" y="$chartY" width="$chartW" height="$chartH" fill="#070d2b" fill-opacity=".48" class="edge"/>
+  $overlayMarkup
   $starMarkup
   $lineMarkup
   $dsoMarkup
