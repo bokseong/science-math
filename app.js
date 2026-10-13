@@ -46,6 +46,25 @@ const fortuneSets = {
   ]
 };
 
+const yearlyFortuneParts = {
+  tones: ['차분한', '선명한', '따뜻한', '용감한', '유연한', '반짝이는', '단단한', '새로운', '조화로운', '깊이 있는'],
+  strengths: ['관찰력', '호기심', '집중력', '표현력', '계획성', '협동심', '상상력', '꾸준함', '판단력', '회복력'],
+  rhythms: ['한 걸음씩', '침착하게', '대담하게', '꼼꼼하게', '가볍게', '꾸준히', '솔직하게', '즐겁게', '균형 있게', '끝까지'],
+  actions: ['첫 단추를 채워 보세요.', '작은 변화를 기록해 보세요.', '좋은 질문을 하나 더 해 보세요.', '마지막 확인을 잊지 마세요.', '주변의 도움을 받아 보세요.', '새로운 방법을 시험해 보세요.', '생각을 말이나 글로 표현해 보세요.', '중요한 일부터 정리해 보세요.', '잠깐 쉬며 방향을 살펴보세요.', '정한 목표를 마무리해 보세요.']
+};
+
+function getYearFortune(year, categoryIndex) {
+  const digits = String(year).padStart(4, '0').slice(-4).split('').map(Number);
+  const rotated = digits.map((_, index) => digits[(index + categoryIndex) % digits.length]);
+  return `${yearlyFortuneParts.tones[rotated[0]]} 빛을 띠어요. ${yearlyFortuneParts.strengths[rotated[1]]}을 살려 ${yearlyFortuneParts.rhythms[rotated[2]]} ${yearlyFortuneParts.actions[rotated[3]]}`;
+}
+
+function getYearFortuneCode(year, month, day, categoryIndex) {
+  // 7919와 10000은 서로소이므로 같은 월·일·항목에서는 모든 4자리 연도가 서로 다른 코드를 갖는다.
+  const value = (year * 7919 + month * 101 + day * 37 + categoryIndex * 1301) % 10000;
+  return String(value).padStart(4, '0');
+}
+
 function isBetween(month, day, sign) {
   const current = month * 100 + day;
   const start = sign.start[0] * 100 + sign.start[1];
@@ -115,9 +134,15 @@ function setupResultPage() {
     item.className = 'fortune-item';
     const heading = document.createElement('strong');
     heading.textContent = category;
+    const copy = document.createElement('div');
+    copy.className = 'fortune-copy';
     const message = document.createElement('span');
-    message.textContent = messages[(seed + index * 5) % messages.length];
-    item.append(heading, message);
+    message.textContent = `${messages[(seed + index * 5) % messages.length]} ${getYearFortune(year, index)}`;
+    const code = document.createElement('small');
+    code.className = 'fortune-code';
+    code.textContent = `${year}년생 별빛 코드 · ${getYearFortuneCode(year, month, day, index)}`;
+    copy.append(message, code);
+    item.append(heading, copy);
     list.append(item);
   });
 }
