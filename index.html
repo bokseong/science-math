@@ -8,34 +8,61 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="entry-page">
-  <div class="floating-zodiac-gallery" aria-hidden="true">
-    <img class="floating-zodiac zodiac-aries" src="assets/zodiac-images/ari.png" alt="">
-    <img class="floating-zodiac zodiac-leo" src="assets/zodiac-images/leo.png" alt="">
-    <img class="floating-zodiac zodiac-libra" src="assets/zodiac-images/lib.png" alt="">
-    <img class="floating-zodiac zodiac-pisces" src="assets/zodiac-images/psc.png" alt="">
-  </div>
-  <main class="entry-shell">
-    <a class="brand" href="index.html" aria-label="첫 화면으로">✦ STAR FINDER</a>
-    <section class="entry-card" aria-labelledby="page-title">
-      <p class="eyebrow">과학·수학 축전 천문 동아리 체험</p>
-      <div class="mobile-zodiac-preview" aria-hidden="true">
-        <img src="assets/zodiac-images/ari.png" alt="">
-        <img src="assets/zodiac-images/lib.png" alt="">
-        <img src="assets/zodiac-images/psc.png" alt="">
-      </div>
-      <div class="hero-constellation" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i><i></i><i></i></div>
-      <h1 id="page-title">나의 별자리<br>찾기</h1>
-      <p class="intro">생일을 입력하고 나의 황도 12궁 별자리와<br>오늘의 별빛 메시지를 확인해 보세요.</p>
+  <main class="landing-shell">
+    <header class="landing-header">
+      <a class="landing-brand" href="index.html" aria-label="첫 화면으로">
+        <img src="assets/deepsky-logo.png" alt="">
+        <span>DEEP SKY<small>STAR FINDER</small></span>
+      </a>
+      <p class="event-chip"><span aria-hidden="true">●</span> 과학·수학 축전 천문 체험</p>
+    </header>
 
-      <form id="birthday-form" class="birthday-form" novalidate>
-        <label for="birthday">태어난 날</label>
-        <input id="birthday" name="birthday" type="text" inputmode="numeric" autocomplete="off" placeholder="예: 2008년 10월 14일" required aria-describedby="date-help">
-        <p id="date-help" class="field-help">예: 2008년 10월 14일 · 2008/10/14 · 20081014<br>출생연도까지 반영해 별빛 메시지를 골라요.</p>
-        <p id="form-error" class="form-error" role="alert" hidden></p>
-        <button type="submit">내 별자리 알아보기 <span aria-hidden="true">→</span></button>
-      </form>
-    </section>
-    <p class="science-note">※ 생일 별자리는 황도 12궁 분류입니다. 실제 밤하늘에서 보이는 별자리는 날짜·시간·관측 장소에 따라 달라질 수 있습니다.</p>
+    <div class="landing-grid">
+      <section class="landing-story" aria-labelledby="page-title">
+        <p class="landing-kicker">BIRTHDAY × CONSTELLATION</p>
+        <h1 id="page-title"><span>별빛으로 읽는</span>나의 탄생 별자리</h1>
+        <p class="landing-intro">실제 별의 위치를 담은 성도를 살펴보고,<br>오늘의 나를 위한 별빛 메시지를 만나 보세요.</p>
+
+        <div class="zodiac-stage" aria-hidden="true">
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <div class="zodiac-core"><strong>12</strong><span>ZODIAC</span></div>
+          <img class="zodiac-card zodiac-card-aries" src="assets/zodiac-images/ari.png" alt="">
+          <img class="zodiac-card zodiac-card-leo" src="assets/zodiac-images/leo.png" alt="">
+          <img class="zodiac-card zodiac-card-libra" src="assets/zodiac-images/lib.png" alt="">
+          <img class="zodiac-card zodiac-card-pisces" src="assets/zodiac-images/psc.png" alt="">
+        </div>
+
+        <div class="experience-points" aria-label="체험 내용">
+          <p><span>01</span><strong>실제 별 위치</strong><small>J2000 기반 성도</small></p>
+          <p><span>02</span><strong>딥스카이 표시</strong><small>성단·성운·은하</small></p>
+          <p><span>03</span><strong>오늘의 운세</strong><small>날짜별 별빛 메시지</small></p>
+        </div>
+      </section>
+
+      <section class="entry-card landing-panel" aria-labelledby="form-title">
+        <div class="panel-heading">
+          <p><span>01</span> BIRTH DATE</p>
+          <h2 id="form-title">태어난 날을<br>알려주세요</h2>
+          <small>출생연월일로 황도 12궁과 오늘의 운세를 찾아드려요.</small>
+        </div>
+
+        <form id="birthday-form" class="birthday-form" novalidate>
+          <label for="birthday">생년월일 직접 입력</label>
+          <input id="birthday" name="birthday" type="text" inputmode="numeric" autocomplete="off" placeholder="2008년 10월 14일" required aria-describedby="date-help">
+          <p id="date-help" class="field-help">2008/10/14 또는 20081014 형식도 가능해요.</p>
+          <p id="form-error" class="form-error" role="alert" hidden></p>
+          <button type="submit"><span>별자리 관측 시작</span><b aria-hidden="true">↗</b></button>
+        </form>
+
+        <div class="panel-footnote">
+          <span aria-hidden="true">✦</span>
+          <p>입력 정보는 저장되지 않습니다.<br><small>운세는 축전 체험을 위한 재미 요소입니다.</small></p>
+        </div>
+      </section>
+    </div>
+
+    <p class="science-note landing-note">※ 생일 별자리는 황도 12궁 분류입니다. 실제 밤하늘에서 보이는 별자리는 날짜·시간·관측 장소에 따라 달라질 수 있습니다.</p>
   </main>
   <footer class="club-footer" aria-label="제작 동아리">
     <img class="club-logo" src="assets/deepsky-logo.png" alt="DEEP SKY 천문동아리 로고">
