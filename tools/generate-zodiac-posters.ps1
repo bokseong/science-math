@@ -85,10 +85,10 @@ foreach ($spec in $posterSpecs) {
     Select-Object -First 12
 
   $starMarkup = foreach ($star in $backgroundStars) {
-    $mag = [double]$star.properties.mag; $r = [Math]::Max(0.8, [Math]::Min(4.2, 5.3 - $mag * 0.62))
+    $mag = [double]$star.properties.mag; $r = [Math]::Max(1.2, [Math]::Min(5.4, 5.8 - $mag * 0.66))
     $x = Format-SvgNumber (& $toX ([double]$star.geometry.coordinates[0])); $y = Format-SvgNumber (& $toY ([double]$star.geometry.coordinates[1])); $radius = Format-SvgNumber $r
-    if ($mag -le 3.5) {
-      $spike = Format-SvgNumber ([Math]::Max(10, $r * 4.3))
+    if ($mag -le 4.2) {
+      $spike = Format-SvgNumber ([Math]::Max(12, $r * 4.8))
       '<g class="bright-star" transform="translate({0} {1})"><path d="M 0,-{2} L 0,{2} M -{2},0 L {2},0"/><circle r="{3}" /></g>' -f $x,$y,$spike,$radius
     } else {
       '<circle class="star" cx="{0}" cy="{1}" r="{2}" />' -f $x,$y,$radius
@@ -126,9 +126,9 @@ foreach ($spec in $posterSpecs) {
   <title id="title">$($spec.Korean) 실제 좌표 성도</title>
   <desc id="desc">J2000 적경과 적위를 등거리로 투영한 $($spec.Latin) 별자리 성도. 항성, 별자리 선, 딥스카이 위치를 표시한다.</desc>
   <style>
-    .zodiac-overlay { opacity:.19; } .star { fill:#fff8cb; filter:url(#starGlow) } .bright-star { fill:#fff8c5; filter:url(#brightGlow) } .bright-star path { stroke:#fff3ac; stroke-width:1.7; stroke-linecap:round; opacity:.9 } .constellation { fill:none; stroke:#f6d36a; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; filter:url(#glow) } .dso { fill:#d7a4ff; fill-opacity:.65; stroke:#f0c6ff; stroke-width:2 } .dso-label { fill:#edccff; font:700 20px Arial,sans-serif; paint-order:stroke; stroke:#101a42; stroke-width:5px; stroke-linejoin:round } .edge { fill:none; stroke:#e5c45f; stroke-width:2 }
+    .zodiac-overlay { opacity:.31; } .star { fill:#fffde0; filter:url(#starGlow) } .bright-star { fill:#fffbd4; filter:url(#brightGlow) } .bright-star path { stroke:#fff3ac; stroke-width:2.1; stroke-linecap:round; opacity:.98 } .constellation { fill:none; stroke:#f6d36a; stroke-opacity:.56; stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round; filter:url(#glow) } .dso { fill:#d7a4ff; fill-opacity:.65; stroke:#f0c6ff; stroke-width:2 } .dso-label { fill:#edccff; font:700 20px Arial,sans-serif; paint-order:stroke; stroke:#101a42; stroke-width:5px; stroke-linejoin:round } .edge { fill:none; stroke:#e5c45f; stroke-width:2 }
   </style>
-  <defs><radialGradient id="sky"><stop stop-color="#1d2a65"/><stop offset="1" stop-color="#060b24"/></radialGradient><filter id="glow"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="starGlow"><feGaussianBlur stdDeviation="1.1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="brightGlow" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <defs><radialGradient id="sky"><stop stop-color="#1d2a65"/><stop offset="1" stop-color="#060b24"/></radialGradient><filter id="glow"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="starGlow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="brightGlow" x="-140%" y="-140%" width="380%" height="380%"><feGaussianBlur stdDeviation="4.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
   <rect width="1600" height="1600" fill="#060b24"/><rect x="20" y="20" width="1560" height="1560" rx="20" fill="url(#sky)" stroke="#f0d47e" stroke-opacity=".6"/>
   <rect x="$chartX" y="$chartY" width="$chartW" height="$chartH" fill="#070d2b" fill-opacity=".48" class="edge"/>
   $overlayMarkup
