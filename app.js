@@ -65,6 +65,14 @@ function getYearFortuneCode(year, month, day, categoryIndex) {
   return String(value).padStart(4, '0');
 }
 
+function getFortuneDate(now = new Date()) {
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  const dayNumber = Math.floor(Date.UTC(year, month - 1, day) / 86400000);
+  return { year, month, day, dayNumber };
+}
+
 function isBetween(month, day, sign) {
   const current = month * 100 + day;
   const start = sign.start[0] * 100 + sign.start[1];
@@ -127,7 +135,9 @@ function setupResultPage() {
   document.querySelector('#zodiac-symbol').textContent = sign.symbol;
   document.querySelector('#zodiac-element').textContent = sign.element;
   document.querySelector('#zodiac-star').textContent = sign.star;
-  const seed = year * 37 + month * 31 + day + sign.name.length;
+  const fortuneDate = getFortuneDate();
+  const seed = year * 37 + month * 31 + day + sign.name.length + fortuneDate.dayNumber;
+  document.querySelector('#fortune-title').textContent = `${fortuneDate.month}월 ${fortuneDate.day}일의 별빛 운세`;
   const list = document.querySelector('#fortune-list');
   Object.entries(fortuneSets).forEach(([category, messages], index) => {
     const item = document.createElement('div');
@@ -140,7 +150,7 @@ function setupResultPage() {
     message.textContent = `${messages[(seed + index * 5) % messages.length]} ${getYearFortune(year, index)}`;
     const code = document.createElement('small');
     code.className = 'fortune-code';
-    code.textContent = `${year}년생 별빛 코드 · ${getYearFortuneCode(year, month, day, index)}`;
+    code.textContent = `${fortuneDate.year}.${fortuneDate.month}.${fortuneDate.day} 기준 · ${year}년생 별빛 코드 ${getYearFortuneCode(year, month, day, index)}`;
     copy.append(message, code);
     item.append(heading, copy);
     list.append(item);
