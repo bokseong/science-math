@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="나의 생일 별자리 결과">
+  <title>나의 별자리 결과</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="result-page">
+  <main class="result-shell">
+    <a class="brand" href="index.html">✦ STAR FINDER</a>
+    <section id="result-card" class="result-card" aria-live="polite">
+      <p class="eyebrow">YOUR ZODIAC SIGN</p>
+      <div id="constellation-art" class="constellation-art" aria-hidden="true"></div>
+      <p id="date-display" class="date-display"></p>
+      <h1 id="zodiac-name"></h1>
+      <p id="zodiac-period" class="zodiac-period"></p>
+      <p id="zodiac-summary" class="zodiac-summary"></p>
+      <div class="info-grid">
+        <article><span>상징</span><strong id="zodiac-symbol"></strong></article>
+        <article><span>원소</span><strong id="zodiac-element"></strong></article>
+        <article><span>대표 별</span><strong id="zodiac-star"></strong></article>
+      </div>
+      <section class="fortune-box" aria-labelledby="fortune-title">
+        <p>✦ STAR MESSAGE</p>
+        <h2 id="fortune-title">오늘의 별빛 메시지</h2>
+        <p id="fortune-text"></p>
+        <small>운세는 축전 체험을 위한 재미 요소입니다.</small>
+      </section>
+      <a class="retry-link" href="index.html">다른 생일로 찾아보기 <span aria-hidden="true">↺</span></a>
+    </section>
+    <p class="science-note">별자리 그림은 모양을 이해하기 위한 일러스트입니다. 실제 별의 밝기와 위치는 관측 환경에 따라 다르게 보일 수 있습니다.</p>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="생일로 나의 황도 12궁 별자리와 오늘의 재미 운세를 알아보는 체험 프로그램">
+  <title>나의 별자리 찾기</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="entry-page">
+  <main class="entry-shell">
+    <a class="brand" href="index.html" aria-label="첫 화면으로">✦ STAR FINDER</a>
+    <section class="entry-card" aria-labelledby="page-title">
+      <p class="eyebrow">과학·수학 축전 천문 동아리 체험</p>
+      <div class="hero-constellation" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i><i></i><i></i></div>
+      <h1 id="page-title">나의 별자리<br>찾기</h1>
+      <p class="intro">생일을 입력하고 나의 황도 12궁 별자리와<br>오늘의 별빛 메시지를 확인해 보세요.</p>
+
+      <form id="birthday-form" class="birthday-form" novalidate>
+        <label for="birthday">생일</label>
+        <input id="birthday" name="birthday" type="date" required aria-describedby="date-help">
+        <p id="date-help" class="field-help">태어난 연도는 별자리 판정에 사용하지 않아요.</p>
+        <p id="form-error" class="form-error" role="alert" hidden></p>
+        <button type="submit">내 별자리 알아보기 <span aria-hidden="true">→</span></button>
+      </form>
+    </section>
+    <p class="science-note">※ 생일 별자리는 황도 12궁 분류입니다. 실제 밤하늘에서 보이는 별자리는 날짜·시간·관측 장소에 따라 달라질 수 있습니다.</p>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
